@@ -13,4 +13,5 @@ def rename_on_xnat(server_url: str,
     with xnat.connect(server=server_url, user=username, password=password) as xlogin:
         xproject = xlogin.projects[project_id]
         xsession = xproject.experiments[session_id]
-    raise NotImplementedError
+    
+        # Rename "scan types" of sessions
