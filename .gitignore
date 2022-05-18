@@ -1,0 +1,15 @@
+/tests/data
+__pycache__
+*.pyc
+*.pklz
+*~
+.DS_Store
+.coverage
+.settings/
+*.swp 
+.settings/
+.pytest_cache/
+__pycache__
+.vscode
+*.egg-info
+~*
