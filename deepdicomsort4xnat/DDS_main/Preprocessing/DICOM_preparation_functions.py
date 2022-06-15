@@ -21,12 +21,12 @@ def sort_DICOM_to_structured_folders(root_dir, move_files=False):
         if len(files) > 0 and not files[0].endswith('.DS_Store'):#####
             #print(files)
 ###################see NPF create_label_file function
-            Dir_name = root.split(root_dir)[1]#[1:]######To get directory pathes contatining dcm files (here risheh of root is root_dir, [1:] is to exclue risheh sign(/))
+            Dir_name = root.split(root_dir)[1][1:]#######(head which is root_dir,the rest). To get directory pathes contatining dcm files (here head is root_dir, [1:] is to exclue sign(/))
             #print(Dir_name)
-            x1 = Dir_name.split('/')[-2]
-            #print(x1)
-            x2 = Dir_name.split('/')[-3]
-            #print(x2)
+            #exp_label = Dir_name.split('/')[0]
+            #print(exp_label)
+            idtype = Dir_name.split('/')[2]#id-scan.type
+            #print(idtype)
 ###################
             for i_file_name in files:
                 try:
@@ -40,10 +40,10 @@ def sort_DICOM_to_structured_folders(root_dir, move_files=False):
                     study_instance_UID = dicom_data.StudyInstanceUID
                     series_instance_UID = dicom_data.SeriesInstanceUID
 
-                    dicom_output_folder = os.path.join(output_dir, x2,x1,patient_ID,
+                    dicom_output_folder = os.path.join(output_dir, idtype, patient_ID,
                                                     study_date, scan_modality,
                                                     study_instance_UID,
-                                                    series_instance_UID)#add Txt1, Txt2
+                                                    series_instance_UID)#add idtype
 
                     if not os.path.exists(dicom_output_folder):
                         os.makedirs(dicom_output_folder)

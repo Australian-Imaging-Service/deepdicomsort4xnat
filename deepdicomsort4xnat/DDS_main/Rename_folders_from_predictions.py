@@ -9,7 +9,6 @@ def create_directory(dir):
     if not os.path.exists(dir):
         os.makedirs(dir)
 
-
 with open('./config.yaml', 'r') as ymlfile:
     cfg = yaml.load(ymlfile)
 
@@ -80,16 +79,22 @@ unique_predictions = np.zeros([len(unique_names), 1])
 #print(file_names)
 
 for root, dir, files in os.walk(structured_dicom_folder):
-    if len(files) > 0 and not files[0].endswith('.DS_Store'):########(1)only last dir has files;(2)To get rid of mac generated .DS_Store files in os.walk()
+    if len(files) > 0 and not files[0].endswith('.DS_Store'):########(1)to get dirs containing dcm files;(2)To get rid of mac generated .DS_Store files in os.walk()
         #print(files)
         #b = root.split(structured_dicom_folder)
         #print(b)
-        dir_name = root.split(structured_dicom_folder)[1][1:]#To get pathes of directories contatining dcm files (here risheh of root is structured_dicom_folder, [1:] is to exclue risheh sign(/))
-        print(dir_name)###########prints directory pathes contatining dcm files
-        patient_ID = dir_name.split('/')[0]
-        #~~~~~~~~~~~~~~~~~~1~in teh beginning of preprocess, you can also put a condition to empty data foldr first, then download the data then do preprocessing.Moreover,in the beginig of the predict_from_CNN.py, put a condition if .csv prediction file exist (from the previous run), delete that first
-        #scan_ID = dir_name.split('/')[1]#~~~~~2~~~~~~~~~~~~~~
-        #exp_label = dir_name.split('/')[0]#~~~~~~3~~~~~~~~~~
+        dir_name = root.split(structured_dicom_folder)[1][1:]#(head,tail):(here head is  structured_dicom_folder, [1:] is to exclue sign(/))
+        #print(dir_name)###########prints directory pathes contatining dcm files
+        #patient_ID = dir_name.split('/')[0]
+        #~~~~~~~~~~~~~~~~~~1~at the end of wf, put a condition to empty data folder and it by product (dcm stuctured folfer, nifti folder, etc.) and delete .csv prediction file exist (from the current run), to go to the next run
+        
+        idtype = dir_name.split('/')[0]
+        print(idtype)
+        ID = idtype.split('-')[0]
+        #print(ID)
+        scanType = idtype.split('-')[1]
+        print(scanType)
+
         sub_dir_name = dir_name.split('/')[1:len(dir_name.split('/'))-1]#---------------
         #print(sub_dir_name)
         #scan_label = dir_name.split('/')[-1]#scan_label is the folder containg dcm files
@@ -105,7 +110,8 @@ for root, dir, files in os.walk(structured_dicom_folder):
         else:
             i_prediction = -1
 
-        #scanType_toRename = prediction_names[i_prediction]#~~~~~4~~~~~~~~~~~~~~
+        scanType_toRename = prediction_names[i_prediction]#~~~~~4~~~~~~~~~~~~~~
+        print(scanType_toRename)
         #~~~~~~~~now rename the scan type on xnat#~~~~~~~~~~~~~~~~
         dicom = pydicom.read_file(os.path.join(root, files[0]))   ################### dicom = pydicom.read_file(os.path.join(root, files[0]), force=True)
 

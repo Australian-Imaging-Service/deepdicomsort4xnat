@@ -1,5 +1,5 @@
 preprocessing:
-    root_dicom_folder: /Users/mahdieh/git/workflows/deepdicomsort4xnat/deepdicomsort4xnat/DDS_main/data/
+    root_dicom_folder: /Users/mahdieh/git/workflows/deepdicomsort4xnat/deepdicomsort4xnat/DDS_main/data
     dcm2niix_bin: /usr/local/bin/dcm2niix
     fslreorient2std_bin: /usr/local/fsl/bin/fslreorient2std
     fslval_bin: /usr/local/fsl/bin/fslval
@@ -23,3 +23,10 @@ post_processing:
 network:
     batch_size: 32
     nb_epoch: 100
+
+XNAT:
+    server_url: http://localhost:8080/
+    project_id: 20220609122023
+    experiment_label: timepoint1
+    username: admin
+    password: admin
