@@ -1,58 +1,65 @@
+from pathlib import Path
 from pydra import Workflow
-
 from pydra import mark
-import xnat
-
 import numpy as np
 import os, shutil, glob
 import pydicom
 import yaml
-
 from tensorflow.keras.models import load_model
 import Tools.data_IO as data_IO
 import tensorflow as tf
-
 from Preprocessing import DICOM_preparation_functions as DPF
 from Preprocessing import NIFTI_preparation_functions as NPF
 import time
+from arcana.core.data.row import DataRow
+
+
 
 @mark.task #---task #1: tested ok----------------------------------------------
-def download_from_xnat(server_url: str,
-                   project_id: str,
-                   experiment_label: str,
-                   username: str,
-                   password: str,
-                   config_ymlfile: str):  
-    
-    with open(config_ymlfile, 'r') as ymlfile:
-        cfg = yaml.safe_load(ymlfile)
+def download_from_xnat(row: DataRow) -> Path:
 
-    Download_dir = cfg['preprocessing']['root_dicom_folder']
-    
-    with xnat.connect(server=server_url, user=username, password=password) as xlogin:
-        xproject = xlogin.projects[project_id]
-        xsession = xproject.experiments[experiment_label]
-        xsession.download_dir(Download_dir) #download the data to the local machine
+    download_dir = Path.cwd() / 'download'
+
+    store = row.dataset.store
+
+    with store:
+        xproject = store.login[row.dataset.id]
+        xsession = xproject.experiments[row.id]
+        xsession.download_dir(str(download_dir)) #download the data to the local machine
+
+    return download_dir
+
 
 
 #task1 = download_from_xnat('http://localhost:8080/','20220609122023','timepoint1','admin','admin','/Users/mahdieh/git/workflows/deepdicomsort4xnat/deepdicomsort4xnat/DDS_main/config.yaml')
 #task1()
 
 @mark.task #---task #2: tested ok----------------------------------------------
-def preprocessing(config_ymlfile: str):
+@mark.annotate({
+    "return": {
+        "label_file": Path,
+        "nifti_dir": Path
+    }
+})
+def preprocessing(dicom_dir: Path,
+                  dcm2niix_bin: str,
+                  fslval_bin: str,
+                  x_image_size: int=256,
+                  y_image_size: int=256,
+                  z_image_size: int=25):
     #config_ymlfile = '/Users/mahdieh/git/workflows/deepdicomsort4xnat/deepdicomsort4xnat/DDS_main/config.yaml'
 
     start_time = time.time()
-    with open(config_ymlfile, 'r') as ymlfile:
-        cfg = yaml.safe_load(ymlfile)
+    # with open(config_ymlfile, 'r') as ymlfile:
+    #     cfg = yaml.safe_load(ymlfile)
 
-    x_image_size = cfg['data_preparation']['image_size_x']
-    y_image_size = cfg['data_preparation']['image_size_y']
-    z_image_size = cfg['data_preparation']['image_size_z']
-    DICOM_FOLDER = cfg['preprocessing']['root_dicom_folder']
-    DCM2NIIX_BIN = cfg['preprocessing']['dcm2niix_bin']
-    FSLREORIENT_BIN = cfg['preprocessing']['fslreorient2std_bin']
-    FSLVAL_BIN = cfg['preprocessing']['fslval_bin']
+    # x_image_size = cfg['data_preparation']['image_size_x']
+    # y_image_size = cfg['data_preparation']['image_size_y']
+    # z_image_size = cfg['data_preparation']['image_size_z']
+    # DICOM_FOLDER = cfg['preprocessing']['root_dicom_folder']
+    # DCM2NIIX_BIN = cfg['preprocessing']['dcm2niix_bin']
+    # FSLREORIENT_BIN = cfg['preprocessing']['fslreorient2std_bin']
+    # FSLVAL_BIN = cfg['preprocessing']['fslval_bin']
 
 
     DEFAULT_SIZE = [x_image_size, y_image_size, z_image_size]
@@ -68,7 +75,7 @@ def preprocessing(config_ymlfile: str):
 
 
     print('Sorting DICOM to structured folders....')
-    structured_dicom_folder = DPF.sort_DICOM_to_structured_folders(DICOM_FOLDER)
+    structured_dicom_folder = DPF.sort_DICOM_to_structured_folders(dicom_dir)
 
     # Turn the following step on if you have problems running the pipeline
     # It will replaces spaces in the path names, which can sometimes
@@ -80,16 +87,16 @@ def preprocessing(config_ymlfile: str):
     DPF.split_in_series(structured_dicom_folder)
 
     print('Converting DICOMs to NIFTI....')
-    nifti_folder = NPF.convert_DICOM_to_NIFTI(structured_dicom_folder, DCM2NIIX_BIN)
+    nifti_folder = NPF.convert_DICOM_to_NIFTI(structured_dicom_folder, dcm2niix_bin)
 
     print('Moving RGB valued images.....')
-    NPF.move_RGB_images(nifti_folder, FSLVAL_BIN)
+    NPF.move_RGB_images(nifti_folder, fslval_bin)
 
     print('Extracting single point from 4D images....')
     images_4D_file = NPF.extract_4D_images(nifti_folder)
 
-    print('Reorient to standard space....')
-    NPF.reorient_to_std(nifti_folder, FSLREORIENT_BIN)
+    # print('Reorient to standard space....')
+    # NPF.reorient_to_std(nifti_folder, FSLREORIENT_BIN)
 
     print('Resampling images....')
     nifti_resampled_folder = NPF.resample_images(nifti_folder, DEFAULT_SIZE)#resample to default size
@@ -106,6 +113,8 @@ def preprocessing(config_ymlfile: str):
     elapsed_time = time.time() - start_time
 
     print(elapsed_time)
+
+    return label_file, nifti_dir
 
 #preprocessing('/Users/mahdieh/git/workflows/deepdicomsort4xnat/deepdicomsort4xnat/DDS_main/config.yaml')
 
