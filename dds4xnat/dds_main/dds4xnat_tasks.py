@@ -6,10 +6,10 @@ import os, shutil, glob
 import pydicom
 import yaml
 from tensorflow.keras.models import load_model
-import Tools.data_IO as data_IO
+from .tools import data_IO
 import tensorflow as tf
-from Preprocessing import DICOM_preparation_functions as DPF
-from Preprocessing import NIFTI_preparation_functions as NPF
+from .preprocessing import DICOM_preparation_functions as DPF
+from .preprocessing import NIFTI_preparation_functions as NPF
 import time
 from arcana.core.data.row import DataRow
 
@@ -23,11 +23,11 @@ def download_from_xnat(row: DataRow) -> Path:
     store = row.dataset.store
 
     with store:
-        xproject = store.login[row.dataset.id]
+        xproject = store.login.projects[row.dataset.id]
         xsession = xproject.experiments[row.id]
         xsession.download_dir(str(download_dir)) 
 
-    return download_dir
+    return str(download_dir)
 
 
 @mark.task #---task #2----------------------------------------------
@@ -101,13 +101,13 @@ def preprocessing(download_dir: Path,
     NPF.rescale_image_intensity(nifti_slices_folder)
 
     print('Creating label file....')
-    NPF.create_label_file(nifti_slices_folder, images_4D_file)
+    label_file = NPF.create_label_file(nifti_slices_folder, images_4D_file)
 
     elapsed_time = time.time() - start_time
 
     print(elapsed_time)
 
-    return label_file, structured_dcm_dir, 
+    return label_file, structured_dcm_dir
 
 
 @mark.task #---task #3----------------------------------------------
@@ -186,13 +186,18 @@ def predict_from_CNN(model_file: str, label_file: str, output_folder: str, x_ima
 
 
 @mark.task #---task #4----------------------------------------------
+@mark.annotate({
+    "return": {
+        "info_file": Path
+    }
+})
 
-def rename_on_xnat(out_file: str, download_dir: str, row: DataRow) -> Path:
+def rename_on_xnat(out_file: str, output_folder: Path, download_dir: str, row: DataRow) -> Path:
     
     store = row.dataset.store
 
     with store:
-        xproject = store.login[row.dataset.id]
+        xproject = store.login.projects[row.dataset.id]
         xsession = xproject.experiments[row.id]
     
         # Rename "scan types" of sessions
@@ -204,7 +209,7 @@ def rename_on_xnat(out_file: str, download_dir: str, row: DataRow) -> Path:
         prediction_file = cfg['post_processing']['prediction_file']
         root_dicom_folder = cfg['preprocessing']['root_dicom_folder']
         """
-        
+        info_file = os.path.join(output_folder, 'info.txt')
         base_dir = os.path.dirname(os.path.normpath(download_dir))
         structured_dicom_folder = os.path.join(base_dir,'DICOM_STRUCTURED')
         #root_out_folder = os.path.join(base_dir, 'DICOM_SORTED')
@@ -248,7 +253,14 @@ def rename_on_xnat(out_file: str, download_dir: str, row: DataRow) -> Path:
                 print(predicted_scan_type)
 
                 scan = xsession.scans[scan_id]
+                #renaming scan type on xnat
                 scan.type = prediction_names[i_prediction]
+
+                with open(info_file, 'w') as the_file:
+                    out_elements = [scan_id, unpredicted_scan_type, predicted_scan_type]
+                    the_file.write('\t'.join(out_elements) + '\n')
+    
+    return info_file
 
 
 @mark.task #----------------------------------------------------------

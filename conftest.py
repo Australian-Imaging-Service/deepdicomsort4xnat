@@ -52,9 +52,9 @@ def mr_session(xnat_project, work_dir, request):
                    user=xnat4tests.config.XNAT_USER,
                    password=xnat4tests.config.XNAT_PASSWORD,
                    cache_dir=work_dir / 'cache')
-    dataset = store.load_dataset(xnat_project.id)
+    dataset = store.new_dataset(xnat_project.id)
     # Access single row of dataset
-    return dataset.row(id=session_label)
+    return dataset.row(id=session_label, row_frequency='session')
     
 
 def make_project_name(dataset_name: str, run_prefix: str=None):
