@@ -13,11 +13,11 @@ __pycache__
 .vscode
 *.egg-info
 ~*
-dds_main/DICOM_STRUCTURED
-dds_main/data
-dds_main/NIFTI*
-dds_main/Output
-dds_main/Res_orig
-dds_main/RGB_images
-dds_main/me_xnat
+dds_orig/DICOM_STRUCTURED
+dds_orig/data
+dds_orig/NIFTI*
+dds_orig/Output
+dds_orig/Res_orig
+dds_orig/RGB_images
+dds_orig/me_xnat
 
