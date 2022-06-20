@@ -1,2 +1,2 @@
-from .workflow import dds4xnat_workflow
-from .tasks import rename_on_xnat
+from .workflow_dds import dds4xnat_workflow
+from .tasks_dds import *
