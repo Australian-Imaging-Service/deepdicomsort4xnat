@@ -207,9 +207,9 @@ def rename_on_xnat(out_file: str, download_dir: str, row: DataRow) -> Path:
         
         base_dir = os.path.dirname(os.path.normpath(download_dir))
         structured_dicom_folder = os.path.join(base_dir,'DICOM_STRUCTURED')
-        root_out_folder = os.path.join(base_dir, 'DICOM_SORTED')
+        #root_out_folder = os.path.join(base_dir, 'DICOM_SORTED')
 
-        os.makedirs(root_out_folder, exist_ok=True)
+        #os.makedirs(root_out_folder, exist_ok=True)
 
         predictions = np.loadtxt(out_file, dtype=np.str) #out_file is the prediction_file
 
