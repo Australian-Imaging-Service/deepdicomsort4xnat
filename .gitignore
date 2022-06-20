@@ -13,11 +13,11 @@ __pycache__
 .vscode
 *.egg-info
 ~*
-deepdicomsort4xnat/DDS_main/DICOM_STRUCTURED
-deepdicomsort4xnat/DDS_main/data
-deepdicomsort4xnat/DDS_main/NIFTI*
-deepdicomsort4xnat/DDS_main/Output
-deepdicomsort4xnat/DDS_main/Res_orig
-deepdicomsort4xnat/DDS_main/RGB_images
-deepdicomsort4xnat/DDS_main/me_xnat
+dds4xnat/DDS_main/DICOM_STRUCTURED
+dds4xnat/DDS_main/data
+dds4xnat/DDS_main/NIFTI*
+dds4xnat/DDS_main/Output
+dds4xnat/DDS_main/Res_orig
+dds4xnat/DDS_main/RGB_images
+dds4xnat/DDS_main/me_xnat
 

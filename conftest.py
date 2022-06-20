@@ -1,18 +1,29 @@
 import os
 from pathlib import Path
+import tempfile
 from datetime import datetime
 import pytest
-import xnat4tests
+import xnat4tests.config
+from arcana.data.stores.medimage import Xnat
 
 
 TEST_SUBJECT_LABEL = 'TESTSUBJ'
 TEST_SESSION_LABEL = 'TESTSUBJ_01'
+
+trained_models_dir = Path(__file__).parent / 'dds4xnat' / 'trained_models'
 
 test_data_dir = Path(__file__).parent / 'tests' / 'data'
 
 test_mr_session_names = [str(p.stem) for p in test_data_dir.iterdir()
                          if not p.name.startswith('.')]
 
+@pytest.fixture(scope='session')
+def trained_model_file():
+    return trained_models_dir / 'model_all_brain_tumor_data.hdf5'
+
+@pytest.fixture()
+def work_dir():
+    return Path(tempfile.mkdtemp())
 
 @pytest.fixture(scope='session')
 def xnat_project(timestamp):
@@ -28,16 +39,23 @@ def xnat_project(timestamp):
 def timestamp():
     "A datetime string used to avoid stale data left over from previous tests"
     return datetime.strftime(datetime.now(), '%Y%m%d%H%M%S')
-    
+
 
 @pytest.fixture(params=test_mr_session_names)
-def mr_session(xnat_project, request):
+def mr_session(xnat_project, work_dir, request):
     session_label = request.param
-    project_id = datetime.strftime(datetime.now(), '%Y%m%d%H%M%S')
+    # Upload test data to test XNAT
     upload_test_dataset(xnat_project, session_label,
                         test_data_dir / session_label)
-    return xnat_project.experiments[session_label]
-
+    # Create store and dataset objects to access data
+    store = Xnat(server=xnat4tests.config.XNAT_URI,
+                   user=xnat4tests.config.XNAT_USER,
+                   password=xnat4tests.config.XNAT_PASSWORD,
+                   cache_dir=work_dir / 'cache')
+    dataset = store.load_dataset(xnat_project.id)
+    # Access single row of dataset
+    return dataset.row(id=session_label)
+    
 
 def make_project_name(dataset_name: str, run_prefix: str=None):
     return (run_prefix if run_prefix else '') + dataset_name

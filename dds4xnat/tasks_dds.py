@@ -6,10 +6,10 @@ import os, shutil, glob
 import pydicom
 import yaml
 from tensorflow.keras.models import load_model
-import Tools.data_IO as data_IO
+# import Tools.data_IO as data_IO
 import tensorflow as tf
-from Preprocessing import DICOM_preparation_functions as DPF
-from Preprocessing import NIFTI_preparation_functions as NPF
+from .preprocessing import DICOM_preparation_functions as DPF
+from .preprocessing import NIFTI_preparation_functions as NPF
 import time
 from arcana.core.data.row import DataRow
 
