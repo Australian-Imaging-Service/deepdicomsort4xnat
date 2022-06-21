@@ -262,17 +262,9 @@ def rename_on_xnat(out_file: Path, output_folder: Path, download_dir: Path, row:
     
     return info_file
 
-
+"""
 @mark.task #----------------------------------------------------------
-def cleanup(download_dir: str):
-    
-    """
-    with open(config_ymlfile, 'r') as ymlfile:
-        cfg = yaml.safe_load(ymlfile)
-
-    data_dir = cfg['preprocessing']['root_dicom_folder']
-    base_dir = os.path.dirname(os.path.normpath(data_dir)) 
-    """
+def cleanup(download_dir: Path):
 
     base_dir = os.path.dirname(os.path.normpath(download_dir)) 
     
@@ -288,3 +280,4 @@ def cleanup(download_dir: str):
     shutil.rmtree(NIFTI_dir)
     shutil.rmtree(NIFTI_RESAMPLED_dir)
     shutil.rmtree(NIFITI_SLICES_dir)
+    """
