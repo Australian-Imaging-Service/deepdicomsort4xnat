@@ -192,7 +192,7 @@ def predict_from_CNN(model_file: str, label_file: str, output_folder: str, x_ima
     }
 })
 
-def rename_on_xnat(out_file: str, output_folder: Path, download_dir: str, row: DataRow) -> Path:
+def rename_on_xnat(out_file: str, output_folder: Path, download_dir: str, row: DataRow):
     
     store = row.dataset.store
 

@@ -40,8 +40,9 @@ def dds4xnat_workflow(name, **kwargs):
         rename_on_xnat(
             name='rename',
             out_file = wf.predict.lzout.out_file,
+            output_folder=wf.lzin.output_folder,
             download_dir=wf.download.lzout.out,
-            output_folder=wf.lzin.output_folder
+            row=wf.lzin.mr_session
         )
     )
 
