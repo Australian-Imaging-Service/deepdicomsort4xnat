@@ -38,8 +38,8 @@ def download_from_xnat(row: DataRow) -> Path:
     }
 })
 def preprocessing(download_dir: Path,
-                  dcm2niix_bin: str,
-                  fslval_bin: str,
+                  dcm2niix_bin: Path,
+                  fslval_bin: Path,
                   x_image_size: int=256,
                   y_image_size: int=256,
                   z_image_size: int=25):
@@ -116,7 +116,7 @@ def preprocessing(download_dir: Path,
         "out_file": Path
     }
 })
-def predict_from_CNN(model_file: str, label_file: str, output_folder: str, x_image_size: int=256, y_image_size: int=256):
+def predict_from_CNN(model_file: Path, label_file: Path, output_folder: Path, x_image_size: int=256, y_image_size: int=256):
  
     batch_size = 1
 
@@ -192,7 +192,7 @@ def predict_from_CNN(model_file: str, label_file: str, output_folder: str, x_ima
     }
 })
 
-def rename_on_xnat(out_file: str, output_folder: Path, download_dir: str, row: DataRow):
+def rename_on_xnat(out_file: Path, output_folder: Path, download_dir: Path, row: DataRow):
     
     store = row.dataset.store
 
