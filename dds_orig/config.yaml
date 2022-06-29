@@ -1,0 +1,32 @@
+preprocessing:
+    root_dicom_folder: /Users/mahdieh/git/workflows/deepdicomsort4xnat/deepdicomsort4xnat/DDS_main/data
+    dcm2niix_bin: /usr/local/bin/dcm2niix
+    fslreorient2std_bin: /usr/local/fsl/bin/fslreorient2std
+    fslval_bin: /usr/local/fsl/bin/fslval
+
+data_preparation:
+    image_size_x: 256
+    image_size_y: 256
+    image_size_z: 25
+
+training:
+    train_label_file: /path/to/train/label/file.txt
+    output_folder: /path/to/output/folder/
+
+testing:
+    test_label_file: /Users/mahdieh/git/workflows/deepdicomsort4xnat/deepdicomsort4xnat/DDS_main/data/labels.txt
+    output_folder: /Users/mahdieh/git/workflows/deepdicomsort4xnat/deepdicomsort4xnat/DDS_main/Output
+    
+post_processing:
+    prediction_file: /Users/mahdieh/git/workflows/deepdicomsort4xnat/deepdicomsort4xnat/DDS_main/Output/Predictions_model_all_brain_tumor_data.csv
+
+network:
+    batch_size: 32
+    nb_epoch: 100
+
+XNAT:
+    server_url: http://localhost:8080/
+    project_id: 20220609122023
+    experiment_label: timepoint1
+    username: admin
+    password: admin

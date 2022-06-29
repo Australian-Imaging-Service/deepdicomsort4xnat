@@ -1,2 +1,3 @@
 arcana
 xnat4tests
+tensorflow>=2.9.1
