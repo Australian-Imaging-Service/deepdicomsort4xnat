@@ -15,7 +15,9 @@ setup(
     install_requires=[
         'tensorflow>=2.9.1',
         'xnat>=0.3.17',
-        'pydra>=0.18'],
+        'pydra>=0.18',
+        'pydicom>=1.0.2',
+        'SimpleITK>=2.1.1.2'],
     extras_require={
         'test': [
             'pytest>=5.4.3',
