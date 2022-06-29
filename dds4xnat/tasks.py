@@ -1,22 +1,18 @@
 from pathlib import Path
-from pydra import Workflow
 from pydra import mark
 import numpy as np
-import os, shutil, glob
-import pydicom
-import yaml
+import os
 from tensorflow.keras.models import load_model
 from .tools import data_IO
 import tensorflow as tf
 from .preprocessing import DICOM_preparation_functions as DPF
 from .preprocessing import NIFTI_preparation_functions as NPF
 import time
-from arcana.core.data.row import DataRow
 
 
 
 @mark.task #---task #1----------------------------------------------
-def download_from_xnat(row: DataRow) -> Path:
+def download_from_xnat(row) -> Path:
 
     download_dir = Path.cwd() / 'data'
 
@@ -192,7 +188,7 @@ def predict_from_CNN(model_file: Path, label_file: Path, output_folder: Path, x_
     }
 })
 
-def rename_on_xnat(out_file: Path, output_folder: Path, download_dir: Path, row: DataRow):
+def rename_on_xnat(out_file: Path, output_folder: Path, download_dir: Path, row):
     
     store = row.dataset.store
 
