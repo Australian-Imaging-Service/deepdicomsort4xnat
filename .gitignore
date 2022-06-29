@@ -4,6 +4,7 @@ __pycache__
 *.pklz
 *~
 .DS_Store
+build/
 .coverage
 .settings/
 *.swp 
